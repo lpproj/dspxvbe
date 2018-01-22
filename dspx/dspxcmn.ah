@@ -1,0 +1,19 @@
+COMMENT #
+===============================================================================
+ dspxcmn.ah
+===============================================================================
+#
+
+		EXTRN	PutMsg:NEAR, PutChar:NEAR, Put_n:NEAR
+		EXTRN	PutHex8:NEAR, PutHex16:NEAR
+		
+		EXTRN	Cpu_type:BYTE
+		EXTRN	bDos5:BYTE, bOs2dos:BYTE, bOs2v2:BYTE
+		
+		EXTRN	IsEnvSbcs:NEAR
+		EXTRN	StrCpy:NEAR, StrCat:NEAR, StrUpper:NEAR, StrCmp:NEAR
+		EXTRN	MemCmp:NEAR
+		EXTRN	GetHex:NEAR
+		EXTRN	SearchPathLen:NEAR
+		
+		EXTRN	Dspxcmn_Init:NEAR

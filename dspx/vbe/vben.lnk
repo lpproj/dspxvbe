@@ -1,0 +1,9 @@
+# This file produced by MS2WLINK
+system dos
+file dspxvben.obj
+file dvbedisp.obj
+file font.obj
+file dspxldr.obj
+file dspxcmn.obj
+name dspxvben.exe
+option caseexact
