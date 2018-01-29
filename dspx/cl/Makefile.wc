@@ -1,0 +1,91 @@
+# makefile for wmake (and jwasm)
+# 
+# wmake -f Makefile.wc
+
+O = obj
+RM_F = rm -f		# wmake builtin
+
+!ifdef __UNIX__
+D = /
+PSEP = :
+DEVNULL = /dev/null
+!else
+D = \ 
+PSEP= ;
+DEVNULL = nul
+!endif
+
+!ifdef __MSDOS__
+WLINK = *wlink
+!else
+WLINK = wlink
+!endif
+
+# directives and options for wlink
+# format : output file format
+#          dos      DOS exe
+#          raw bin  raw (flat) binary
+#                   (guess 'dos com' may be used for older wlink)
+# disable : do not show message(s)
+#           W1014   stack segment not found
+#           W1023   no starting address found
+# option caseexact : respect case of symbols (same as /NOI for MS-Link)
+# option quiet : supress logo massage
+# option nodefaultlibs : do not search default libraries
+# option map : generate map file
+#
+WLINK_EXE = $(WLINK) option quiet option nodefaultlibs option caseexact format dos
+WLINK_BIN = $(WLINK) option quiet option nodefaultlibs option caseexact format raw bin disable 1014,1023
+
+AS = jwasm
+#AS = wasm
+ASFLAGS = -q -Fr=$(DEVNULL) -I. -I.. -DLPDRV_API -DINTERNAL_PROF_BUFFER
+ASSEMBLE = $(AS) $(ASFLAGS) -Fo=$^@
+
+# Microsoft MASM 6.x
+#AS = ml
+#ASFLAGS = -nologo -Cp -c -I. -I.. -DLPDRV_API -DINTERNAL_PROF_BUFFER
+#ASSEMBLE = $(AS) $(ASFLAGS) -Fo$^@
+
+H = ..$(D)mydef.inc ..$(D)dspx.inc ..$(D)dspxseg.inc ..$(D)dspxentr.inc ..$(D)dspxcmn.ah
+
+all : dspx543x.exe dspx543x.pro
+
+clean: .SYMBOLIC
+	-$(RM_F) dspx543x.exe dspx543x.pro
+	-$(RM_F) dspx543x.$(O) cl3xdisp.$(O) cl3xhw.$(O) fontexp.$(O)
+	-$(RM_F) font.$(O) dspxcmn.$(O) dspxldr.$(O)
+	-$(RM_F) prof543x.$(O)
+	-$(RM_F) *.lst *.map *.err
+
+
+dspx543x.exe : cl3xdisp.$(O) cl3xhw.$(O) dspxcmn.$(O) font.$(O) fontexp.$(O) dspxldr.$(O) dspx543x.$(O)
+	$(WLINK_EXE) name $^@ file { $< }
+
+dspx543x.pro : prof543x.$(O)
+	$(WLINK_BIN) name $^@ file { $< }
+
+prof543x.$(O) : prof543x.asm prof543x.inc
+	$(ASSEMBLE) prof543x.asm
+
+dspx543x.$(O) : dspx543x.asm $(H) ..$(D)bitblt.inc cl3xdisp.inc cl3xhw.inc ..$(D)dspxldr.inc font.inc fontexp.inc
+	$(ASSEMBLE) dspx543x.asm
+
+cl3xdisp.$(O) : cl3xdisp.asm $(H) ..$(D)bitblt.inc cl3xdisp.inc cl3xhw.inc ..$(D)dspxldr.inc font.inc
+	$(ASSEMBLE) cl3xdisp.asm
+
+cl3xhw.$(O) : cl3xhw.asm $(H) ..$(D)bitblt.inc cl3xhw.inc
+	$(ASSEMBLE) cl3xhw.asm
+
+fontexp.$(O) : fontexp.asm $(H) font.inc fontexp.inc
+	$(ASSEMBLE) fontexp.asm
+
+dspxldr.$(O) : ..$(D)dspxldr.asm ..$(D)dspxldr.inc $(H)
+	$(ASSEMBLE) ..$(D)dspxldr.asm
+
+dspxcmn.$(O) : ..$(D)dspxcmn.asm $(H)
+	$(ASSEMBLE) ..$(D)dspxcmn.asm
+
+font.$(O) : font.asm font.inc $(H)
+	$(ASSEMBLE) font.asm
+

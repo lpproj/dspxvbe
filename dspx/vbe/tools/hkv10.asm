@@ -45,7 +45,7 @@ tvect		ENDS
 
 _TEXT		SEGMENT BYTE PUBLIC
 _TEXT		ENDS
-STACK		SEGMENT PARA STACK
+STACK		SEGMENT PARA STACK 'STACK'
 STACK		ENDS
 
 
@@ -239,9 +239,9 @@ VectOn		PROC	NEAR
 	pushm	<bx,es>
 	mov	ax,APIGETWORK
 	call	dword ptr [ApiPtr]
-	cmp	es:[bx + (tvect.flag_onoff)],0
+	cmp	byte ptr es:[bx + (tvect.flag_onoff)],0
 	jne	vecton_exit
-	mov	es:[bx + (tvect.flag_onoff)],1
+	mov	byte ptr es:[bx + (tvect.flag_onoff)],1
 	pushm	<bx,es>
 	mov	ax,3510h
 	int	21h
@@ -272,9 +272,9 @@ VectOff		PROC	NEAR
 	pushm	<bx,ds,es>
 	mov	ax,APIGETWORK
 	call	dword ptr [ApiPtr]
-	cmp	es:[bx + (tvect.flag_onoff)],0
+	cmp	byte ptr es:[bx + (tvect.flag_onoff)],0
 	je	vectoff_exit
-	mov	es:[bx + (tvect.flag_onoff)],0
+	mov	byte ptr es:[bx + (tvect.flag_onoff)],0
 	mov	dx,word ptr es:[bx + (tvect.prev_vect)]
 	mov	cx,word ptr es:[bx + (tvect.prev_vect+2)]
 	pushm	<bx,ds,es>

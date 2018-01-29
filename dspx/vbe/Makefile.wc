@@ -1,0 +1,96 @@
+# makefile for wmake (and jwasm)
+# 
+# wmake -h -f Makefile.wc
+
+O = obj
+RM_F = rm -f		# wmake builtin
+
+!ifdef __UNIX__
+D = /
+PSEP = :
+DEVNULL = /dev/null
+!else
+D = \ 
+PSEP= ;
+DEVNULL = nul
+!endif
+
+!ifdef __MSDOS__
+WLINK = *wlink
+!else
+WLINK = wlink
+!endif
+
+# directives and options for wlink
+# format : output file format
+#          dos      DOS exe
+#          raw bin  raw (flat) binary
+#                   (guess 'dos com' may be used for older wlink)
+# disable : do not show message(s)
+#           W1014   stack segment not found
+#           W1023   no starting address found
+# opttion caseexact : respect case of symbols (same as /NOI for MS-Link)
+# option quiet : supress logo massage
+# option nodefaultlibs : do not search default libraries
+# option map : generate map file
+#
+WLINK_EXE = $(WLINK) option quiet option nodefaultlibs option caseexact format dos
+WLINK_BIN = $(WLINK) option quiet option nodefaultlibs option caseexact format raw bin disable 1014,1023
+
+AS = jwasm
+#AS = wasm
+ASFLAGS = -q -Fr=$(DEVNULL) -I. -I.. -DLPDRV_API
+ASSEMBLE = $(AS) $(ASFLAGS) -Fo=$^@
+
+# Microsoft MASM 6.x
+#AS = ml
+#ASFLAGS = -nologo -Cp -c -I. -I.. -DLPDRV_API
+#ASSEMBLE = $(AS) $(ASFLAGS) -Fo$^@
+
+
+H = ..$(D)mydef.inc ..$(D)dspx.inc ..$(D)dspxseg.inc ..$(D)dspxcmn.ah
+
+all : dspxvben.exe dspxvbe.exe dspxvbe.pro
+
+clean: .SYMBOLIC
+	-$(RM_F) dspxvben.exe dspxvbe.exe dspxvbe.pro
+	-$(RM_F) dspxvben.$(O) dvbedisp.$(O) dspxvbe.$(O) dvbew64k.$(O)
+	-$(RM_F) font.$(O) dspxcmn.$(O) dspxldr.$(O)
+	-$(RM_F) profvbe.$(O)
+	-$(RM_F) *.lst *.map *.err
+
+
+dspxvbe.exe : dspxvbe.$(O) dvbew64k.$(O) font.$(O) dspxcmn.$(O) dspxldr.$(O)
+	$(WLINK_EXE) name $^@ file { $< }
+
+dspxvben.exe : dspxvben.$(O) dvbedisp.$(O) font.$(O) dspxcmn.$(O) dspxldr.$(O)
+	$(WLINK_EXE) name $^@ file { $< }
+
+dspxvbe.pro : profvbe.$(O)
+	$(WLINK_BIN) name $^@ file { $< }
+
+
+profvbe.$(O) : profvbe.asm profvbe.inc
+	$(ASSEMBLE) profvbe.asm
+
+dspxvben.$(O) : dspxvbe.asm $(H)
+	$(ASSEMBLE) dspxvbe.asm
+
+dspxvbe.$(O) : dspxvbe.asm $(H)
+	$(ASSEMBLE) -DW64K dspxvbe.asm
+
+dvbedisp.$(O) : dvbedisp.asm dvbedisp.inc dspxvbe.inc $(H)
+	$(ASSEMBLE) dvbedisp.asm
+
+dvbew64k.$(O) : dvbedisp.asm dvbedisp.inc dspxvbe.inc $(H)
+	$(ASSEMBLE) -DW64K dvbedisp.asm
+
+dspxldr.$(O) : ..$(D)dspxldr.asm ..$(D)dspxldr.inc $(H)
+	$(ASSEMBLE) ..$(D)dspxldr.asm
+
+dspxcmn.$(O) : ..$(D)dspxcmn.asm $(H)
+	$(ASSEMBLE) ..$(D)dspxcmn.asm
+
+font.$(O) : font.asm font.inc $(H)
+	$(ASSEMBLE) font.asm
+

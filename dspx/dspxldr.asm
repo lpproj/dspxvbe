@@ -556,7 +556,7 @@ TfrVmt		PROC	NEAR
 	inc	di
 	cmp	al,1
 	jne	@@2
-	test	es:[di + (tVms.vms_info)],80h
+	test	byte ptr es:[di + (tVms.vms_info)],80h
 	jnz	@@2
 	mov	al,es:[di + (tVms.vms_vm)]
 	cmp	al,70h
@@ -1058,15 +1058,15 @@ DspxLdr_Chkvm	PROC	NEAR
 	mov	[cvms_errdrv],1
 	jmps	@@cnt
 @@2:
-	test	[si + (tVms.vms_info)],80h
+	test	byte ptr [si + (tVms.vms_info)],80h
 	jnz	@@cnt
 	mov	al,[si + (tVms.vms_columns)]
-	mul	[si + (tVms.vms_rows)]
+	mul	byte ptr [si + (tVms.vms_rows)]
 	add	ax,ax
 	jc	@@tbovr
-	cmp	[si + (tVms.vms_vm)],70h
+	cmp	byte ptr [si + (tVms.vms_vm)],70h
 	je	@@4
-	cmp	[si + (tVms.vms_vm)],73h
+	cmp	byte ptr [si + (tVms.vms_vm)],73h
 	je	@@4
 	add	ax,ax
 	jc	@@tbovr
@@ -1074,7 +1074,7 @@ DspxLdr_Chkvm	PROC	NEAR
 	cmp	ax,[dspx_tb_size]
 	jb	@@cnt
 @@tbovr:
-	or	[si + (tVms.vms_info)],80h
+	or	byte ptr [si + (tVms.vms_info)],80h
 	mov	[cvms_tbover],1
 @@cnt:
 	add	si,16
@@ -1396,7 +1396,7 @@ SetNewVect	PROC	NEAR
 	jcxz	@@ok
 	les	di,[vecttable]
 @@lp:
-	test	es:[di + (tLPVect.lpvect_flag)],LPDRV_USEVECT
+	test	byte ptr es:[di + (tLPVect.lpvect_flag)],LPDRV_USEVECT
 	jz	@@cnt
 	mov	al,es:[di + (tLPVect.lpvect_no)]
 	mov	ah,35h
@@ -1435,7 +1435,7 @@ QueryVectRmv	PROC	NEAR
 	jcxz	@@ok
 	les	di,[vecttable]
 @@lp:
-	test	es:[di + (tLPVect.lpvect_flag)],LPDRV_USEVECT
+	test	byte ptr es:[di + (tLPVect.lpvect_flag)],LPDRV_USEVECT
 	jz	@@cnt
 	mov	al,es:[di + (tLPVect.lpvect_no)]
 	mov	ah,35h
@@ -1469,7 +1469,7 @@ RemoveVect	PROC	NEAR
 	jcxz	@@ok
 	les	di,[vecttable]
 @@lp:
-	test	es:[di + (tLPVect.lpvect_flag)],LPDRV_USEVECT
+	test	byte ptr es:[di + (tLPVect.lpvect_flag)],LPDRV_USEVECT
 	jz	@@cnt
 	mov	al,es:[di + (tLPVect.lpvect_no)]
 	mov	ah,25h

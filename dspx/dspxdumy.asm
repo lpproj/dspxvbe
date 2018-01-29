@@ -109,7 +109,7 @@ TSR_TEXT	ENDS
 
 _DATA		SEGMENT
 sCardID		db	ID_CARDINFO
-msgOpening	db	'DSPXDUMY version 0.00 (c)鯖/LP-Project. 1996',CR,LF,0
+msgOpening	db	'DSPXDUMY version 0.00 (c)鯖/LP-Project. 1996, 2018',CR,LF,0
 msgHelp		db	'IBM DOS/V Extension 用のダミー V-Text ドライバです。'
 		db	CR,LF,CR,LF
 		db	'DSPXDUMY [/NOUMB] [/R]',CR,LF
@@ -192,5 +192,9 @@ Drv_Getbottom	ENDP
 _TEXT		ENDS
 
 
+_DATA		SEGMENT
+Buf_Entry	dw	0
+Buf_Size	dw	0
+_DATA		ENDS
 
 		END

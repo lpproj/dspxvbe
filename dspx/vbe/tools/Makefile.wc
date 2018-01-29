@@ -1,0 +1,77 @@
+# makefile for wmake (and jwasm)
+# 
+# wmake -h -f Makefile.wc
+
+O = obj
+RM_F = rm -f		# wmake builtin
+
+!ifdef __UNIX__
+D = /
+PSEP = :
+DEVNULL = /dev/null
+!else
+D = \ 
+PSEP= ;
+DEVNULL = nul
+!endif
+
+!ifdef __MSDOS__
+WLINK = *wlink
+!else
+WLINK = wlink
+!endif
+
+# directives and options for wlink
+# format : output file format
+#          dos      DOS exe
+#          raw bin  raw (flat) binary
+#                   (guess 'dos com' may be used for older wlink)
+# disable : do not show message(s)
+#           W1014   stack segment not found
+#           W1023   no starting address found
+# opttion caseexact : respect case of symbols (same as /NOI for MS-Link)
+# option quiet : supress logo massage
+# option nodefaultlibs : do not search default libraries
+# option map : generate map file
+#
+WLINK_EXE = $(WLINK) option quiet option nodefaultlibs option caseexact format dos
+WLINK_BIN = $(WLINK) option quiet option nodefaultlibs option caseexact format raw bin disable 1014,1023
+
+AS = jwasm
+#AS = wasm
+ASFLAGS = -q -Fr=$(DEVNULL) -I.
+ASSEMBLE = $(AS) $(ASFLAGS) -Fo=$^@
+
+# Microsoft MASM 6.x
+AS = ml
+ASFLAGS = -nologo -Cp -c -I.
+ASSEMBLE = $(AS) $(ASFLAGS) -Fo$^@
+
+
+all : hkv10.exe vmstack.sys vbefix.exe
+
+clean: .SYMBOLIC
+	-$(RM_F) hkv10.exe vmstack.sys vbefix.exe
+	-$(RM_F) hkv10.$(O) vmstack.$(O) vbefix.$(O)
+	-$(RM_F) *.lst *.map *.err
+
+
+hkv10.exe : hkv10.$(O)
+	$(WLINK_EXE) name $^@ file { $< }
+
+vbefix.exe : vbefix.$(O)
+	$(WLINK_EXE) name $^@ file { $< }
+
+vmstack.sys : vmstack.$(O)
+	$(WLINK_BIN) name $^@ file { $< }
+
+hkv10.$(O): hkv10.asm
+	$(ASSEMBLE) hkv10.asm
+
+vbefix.$(O): vbefix.asm
+	$(ASSEMBLE) vbefix.asm
+
+vmstack.$(O): vmstack.asm
+	$(ASSEMBLE) vmstack.asm
+
+

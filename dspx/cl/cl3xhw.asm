@@ -314,8 +314,8 @@ TfrMem2Scrn	PROC	NEAR
 	mov	ax,[di + (tBlt.blt_height)]
 	dec	ax
 	mov	[si + (tClb.clb_height)],ax
-	mov	[si + (tClb.clb_rop)],CLB_ROP_SRC
-	mov	[si + (tClb.clb_mode)],CLB_BLT_MEMEXP
+	mov	byte ptr [si + (tClb.clb_rop)],CLB_ROP_SRC
+	mov	byte ptr [si + (tClb.clb_mode)],CLB_BLT_MEMEXP
 	_wait_acc
 	push	di
 	call	[BltStart]
@@ -415,8 +415,8 @@ InvertRect	PROC	NEAR
 	mov	eax,[si + (tClb.clb_dest)]
 	;xor	eax,eax
 	mov	[si + (tClb.clb_src)],eax
-	mov	[si + (tClb.clb_fg)],0fh
-	mov	[si + (tClb.clb_bg)],0fh
+	mov	byte ptr [si + (tClb.clb_fg)],0fh
+	mov	byte ptr [si + (tClb.clb_bg)],0fh
 	_wait_acc
 	call	[BltStart]
 	popf

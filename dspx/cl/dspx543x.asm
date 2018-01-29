@@ -1,7 +1,7 @@
 COMMENT #
 ===============================================================================
  dspx543x.asm
- (c)éI/LP-Project. 1996
+ (c)éI/LP-Project. 1996, 2018
 ===============================================================================
 #
 
@@ -443,7 +443,7 @@ msgOpening	db	'DSPX543X version ','0' + CL3X_MAJOR, '.'
 		IF (CL3X_MAJOR EQ 0)
 		db	' ** ï]âøî≈ ** '
 		ENDIF
-		db	' (c)éI/LP-Project. 1996',CR,LF,0
+		db	' (c)éI/LP-Project. 1996, 2018',CR,LF,0
 
 msgHelp		db	'Cirrus Logic CL-GD5430/34/36/40 ópÇÃÉrÉfÉIägí£'
 		db	'ÉhÉâÉCÉoÅ[Ç≈Ç∑ÅB',CR,LF
@@ -828,7 +828,7 @@ IsFontAvail	ENDP
 
 Drv_Checkvms	PROC	NEAR
 	mov	[tmp_noreso],0
-	cmp	[si + (tVms.vms_screenx)],1024
+	cmp	word ptr [si + (tVms.vms_screenx)],1024
 	jbe	@@2
 	cmp	[vram_size],2048
 	jae	@@2
@@ -843,15 +843,15 @@ Drv_Checkvms	PROC	NEAR
 	mov	ax,word ptr [tmp_nofont]
 	or	ax,ax
 	jnz	@@4
-	and	[si + (tVms.vms_info)],7fh
+	and	byte ptr [si + (tVms.vms_info)],7fh
 	jmps	@@exit
 @@4:
-	test	[si + (tVms.vms_info)],80h
+	test	byte ptr [si + (tVms.vms_info)],80h
 	jz	@@nosupp
 	mov	ax,0
 	jmps	@@exit
 @@nosupp:
-	or	[si + (tVms.vms_info)],80h
+	or	byte ptr [si + (tVms.vms_info)],80h
 	or	word ptr [err_nofont],ax
 	mov	ax,80h
 @@exit:
@@ -886,6 +886,19 @@ Drv_Getbottom	ENDP
 
 
 _TEXT		ENDS
+
+	IFDEF INTERNAL_PROF_BUFFER
+		EXTRN	sfc_top:NEAR
+_DATA		SEGMENT
+Buf_Entry	dw	ofs sfc_top
+Buf_Size	dw	8192		; max 2 * 32 * 256 (16384)
+_DATA		ENDS
+	ELSE
+_DATA		SEGMENT
+Buf_Entry	dw	0
+Buf_Size	dw	0
+_DATA		ENDS
+	ENDIF
 
 COMMENT #
 -------------------------------------------------------------------------------

@@ -2,7 +2,7 @@ COMMENT #
 ===============================================================================
  dspxvbe.asm
  version 0.03
- (c)鯖/LP-Project. 1996-97
+ (c)鯖/LP-Project. 1996-97, 2018
 ===============================================================================
 #
 		INCLUDE ..\mydef.inc
@@ -1171,7 +1171,7 @@ msgOpening	db	'DSPXVBE version '
 		IFDEF	W64K
 		db	' (64K-Windowed)'
 		ENDIF
-		db	' (c)鯖/LP-Project. 1996',CR,LF,0
+		db	' (c)鯖/LP-Project. 1996-1997, 2018',CR,LF,0
 msgHelp		db	'VESA BIOS 汎用の IBM DOS/V Extension ビデオ拡張'
 		db	'ドライバです。',CR,LF
 		db	CR,LF
@@ -1346,7 +1346,7 @@ Drv_Checkvms	PROC	NEAR
 	cmp	al,0
 	jne	@@2
 @@nofont:
-	test	[bx + (tVms.vms_info)],80h
+	test	byte ptr [bx + (tVms.vms_info)],80h
 	jnz	@@no_thru
 	mov	[cvm_nofont],1
 	jmps	@@no_set
@@ -1362,19 +1362,19 @@ Drv_Checkvms	PROC	NEAR
 	call	GetVmsVm
 	cmp	ax,-1
 	jne	@@avail
-	test	[bx + (tVms.vms_info)],80h
+	test	byte ptr [bx + (tVms.vms_info)],80h
 	jnz	@@no_thru
 	mov	[cvm_novm],1
 	jmps	@@no_set
 @@no_set:				; 使えない
 	mov	ax,80h
-	or	[bx + (tVms.vms_info)],80h
+	or	byte ptr [bx + (tVms.vms_info)],80h
 	jmps	@@exit
 @@no_thru:				; 使えない（もともと使えなかった）
 	mov	ax,0
 	jmps	@@exit
 @@avail:				; 使える
-	and	[bx + (tVms.vms_info)],7fh
+	and	byte ptr [bx + (tVms.vms_info)],7fh
 	mov	ax,1
 @@exit:
 	popm	<es,si,cx,bx>
@@ -2503,7 +2503,7 @@ FillVbePack	PROC	NEAR
 	movseg	es,cs
 	mov	di,ofs Tmpbuff + 512
 	
-	mov	es:[di + (tVesam.vesam_attr)],0
+	mov	word ptr es:[di + (tVesam.vesam_attr)],0
 	mov	ax,4f01h
 	_call_int10
 	cmp	ax,004fh
@@ -2527,7 +2527,7 @@ FillVbePack	PROC	NEAR
 @@creso_2:
 	movseg	es,cs
 	mov	di,ofs Tmpbuff + 512
-	mov	es:[di + (tVesam.vesam_attr)],0
+	mov	word ptr es:[di + (tVesam.vesam_attr)],0
 	;
 	pushm	<cx,di>
 	mov	cx,256
@@ -2650,7 +2650,7 @@ CheckVmExist	PROC	NEAR
 	call	FillVbePack
 	cmp	ax,VBEPK_NOERR
 	je	@@cont
-	mov	[si + (tVbepack.vbepk_vm)],-1
+	mov	word ptr [si + (tVbepack.vbepk_vm)],-1
 	dec	dx
 @@cont:
 	inc	dx

@@ -1,0 +1,48 @@
+#
+# makefile for (Open)Watcom and jwasm
+# wmake -f Makefile.wc
+#
+
+BASEDIR = $+ $(%cwd) $-
+
+.AFTER:
+	@cd $(BASEDIR)
+
+all: dspxvbe dspx543x dspxdumy
+
+clean: .SYMBOLIC
+	cd dspx
+	wmake -h -f Makefile.wc clean
+	cd vbe
+	wmake -h -f Makefile.wc clean
+	cd tools
+	wmake -h -f Makefile.wc clean
+	cd $(BASEDIR)
+	cd dspx
+	cd cl
+	wmake -h -f Makefile.wc clean
+	cd tools
+	wmake -h -f Makefile.wc clean
+	cd $(BASEDIR)
+
+dspxvbe: .SYMBOLIC
+	cd dspx
+	cd vbe
+	wmake -h -f Makefile.wc
+	cd tools
+	wmake -h -f Makefile.wc
+	cd $(BASEDIR)
+
+dspx543x: .SYMBOLIC
+	cd dspx
+	cd cl
+	wmake -h -f Makefile.wc
+	cd tools
+	wmake -h -f Makefile.wc
+	cd $(BASEDIR)
+
+dspxdumy: .SYMBOLIC
+	cd dspx
+	wmake -h -f Makefile.wc
+	cd $(BASEDIR)
+

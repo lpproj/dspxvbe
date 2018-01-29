@@ -40,7 +40,7 @@ IsSbcsFontT	PROC	NEAR
 	mov	bh,0
 	call	GetFontSize2Vms
 	jz	@@ok
-	and	[si + (tVms.vms_fontindex)],0fh
+	and	byte ptr [si + (tVms.vms_fontindex)],0fh
 	mov	bh,0
 	call	GetFontSize2Vms
 	jz	@@ok2
@@ -67,7 +67,7 @@ IsDbcsFontT	PROC	NEAR
 	mov	bh,1
 	call	GetFontSize2Vms
 	jz	@@ok
-	and	[si + (tVms.vms_fontindex)],0f0h
+	and	byte ptr [si + (tVms.vms_fontindex)],0f0h
 	mov	bh,1
 	call	GetFontSize2Vms
 	jz	@@ok2
@@ -97,7 +97,7 @@ GetFontSize2Vms	PROC	NEAR
 	mov	dh,[si + (tVms.vms_fontheight)]
 	mov	word ptr [si + (tVms.vms_srcfontwidth)],dx
 	xchg	dl,dh
-	mov	[si + (tVms.vms_fontindex)],0
+	mov	byte ptr [si + (tVms.vms_fontindex)],0
 @@2:
 	mov	bl,[si + (tVms.vms_fontindex)]
 	and	bh,1
@@ -129,7 +129,7 @@ DummyChgProc	ENDP
 AssignFont	PROC	NEAR
 	pushm	<cx>
 @@lp:
-	cmp	[bx + (tFont.tf_avail)],0
+	cmp	byte ptr [bx + (tFont.tf_avail)],0
 	je	@@cont
 	mov	al,[bx + (tVms.vms_info)]
 	and	al,VT_VM_MASK

@@ -60,7 +60,7 @@ TSR_TEXT	SEGMENT
 Init_cl3xdisp	PROC	NEAR
 	mov	di,ofs sdata
 	mov	ax,word ptr [bx + (tVms.vms_charwidth)]
-	test	[bx + (tVms.vms_info)],VT_VM_MASK
+	test	byte ptr [bx + (tVms.vms_info)],VT_VM_MASK
 	jz	@@2
 	xchg	al,ah
 @@2:
@@ -144,8 +144,8 @@ Init_bblk	ENDP
 
 Init_fctop	PROC	NEAR
 	mov	di,ofs sdata
-	movzx	eax,[di + (tBltini.bltini_width)]
-	movzx	ecx,[di + (tBltini.bltini_height)]
+	movzx	eax,word ptr [di + (tBltini.bltini_width)]
+	movzx	ecx,word ptr [di + (tBltini.bltini_height)]
 	mul	ecx
 	add	eax,3
 	and	eax,0fffffffch
@@ -394,7 +394,7 @@ L_DATA		ENDS
 
 SelectCsrHWSW	PROC	NEAR
 	push	ax
-	test	[bx + (tVms.vms_info)],00000001b
+	test	byte ptr [bx + (tVms.vms_info)],00000001b
 	jz	@@sw
 	mov	[SetCsrPtn],ofs SetCsrPtn_hw
 	mov	[DispCsr],ofs DispCsr_hw
@@ -417,7 +417,7 @@ SetCsrPtn_hw	PROC	NEAR
 	mov	si,ofs hw_csr
 	mov	al,byte ptr [cwidth_s]
 	mov	[si + (tCsrSize.csiz_width)],al
-	mov	[si + (tCsrSize.csiz_left)],0
+	mov	byte ptr [si + (tCsrSize.csiz_left)],0
 	cmp	cl,byte ptr [cheight]
 	jae	@@nodisp
 	cmp	ch,byte ptr [cheight]
@@ -685,7 +685,7 @@ CacheDbcsFonts	PROC	NEAR
 	cmp	al,ah
 	ja	@@cnt
 	mov	cl,al
-	movzx	eax,[si + (tCachetbl.cache_offset)]
+	movzx	eax,word ptr [si + (tCachetbl.cache_offset)]
 	movzx	ebx,[bblk_dbcs.blt_bytes]
 	mul	ebx
 	add	eax,[fctop_d]
@@ -754,6 +754,10 @@ COMMENT #
 
 -------------------------------------------------------------------------------
 #
+
+	IFDEF INTERNAL_PROF_BUFFER
+		PUBLIC	sfc_top
+	ENDIF
 
 L_DATA		SEGMENT
 sbcsfontbytes	dw	?
